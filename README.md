@@ -6,10 +6,11 @@ Hotel pro domácí mazlíčky
 * Maven 3+
 
 # Instalace a spuštění
-- Stáhnout si soubor Spring/anipia, ve kterém jsou veškeré zdrojové kódy.
-- Otevřit soubor v nějakém editoru, třeba VS Code.
+- Stáhnout si soubor hotel-anipia-vue, ve kterém jsou veškeré zdrojové kódy.
+- Otevřit soubor v nějakém editoru, např. VS Code.
 - Podle struktury projektu se přemístit do AnipiaApplication.java a následně ho spustit.
-- Aplikace poběží na: ➡ http://localhost:8080
+- V terminalu spustit vue pomocí příkazu npm run dev.
+- Aplikace poběží na: ➡ http://localhost:5173
 
 # Přístup do H2 konzole
 Otevřit v prohlížeči: ➡ http://localhost:8080/h2-console
