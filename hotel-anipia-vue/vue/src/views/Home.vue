@@ -1,7 +1,6 @@
 <template>
   <div>
     <main class="mainPage">
-      <!-- Hlavní obrázek + info -->
       <div class="main-image">
         <div class="main-image-wrapper wrapper">
           <div class="main-image-content">
@@ -24,7 +23,6 @@
         </div>
       </div>
 
-      <!-- Price list -->
       <section class="price-list">
         <div class="wrapper">
           <h2 class="price-list-title">Our Price List</h2>
@@ -40,7 +38,6 @@
         </div>
       </section>
 
-      <!-- Rules section -->
       <section class="rules-section">
         <div class="wrapper">
           <div class="rules-content">
@@ -57,7 +54,6 @@
         </div>
       </section>
 
-      <!-- Services section -->
       <section class="services-section">
         <div class="wrapper">
           <h2 class="services-title">Services</h2>
@@ -75,20 +71,6 @@
           </div>
         </div>
       </section>
-
-      <!-- Modální okna pro mazlíčky 
-      <div v-for="(pet, index) in pets" :key="index">
-        <div v-if="pet.modalOpen" class="modal" @click.self="closeModal(index)">
-          <div class="modal-content">
-            <span class="close" @click="closeModal(index)">&times;</span>
-            <h3>{{ pet.name }}</h3>
-            <img :src="pet.img" :alt="pet.name" />
-            <p>{{ pet.desc }}</p>
-          </div>
-        </div>
-      </div> -->
-
-      <!-- Toast hláška -->
       <Toast v-if="toast.visible" :message="toast.message" :type="toast.type" />
     </main>
   </div>
@@ -117,7 +99,6 @@ import vet from '../assets/Photos/veterinary.webp'
 import play from '../assets/Photos/play.webp'
 import rulesImage from '../assets/Photos/rulesImage.png'
 
-// --- Composable ---
 const {
   isMenuActive,
   toggleMenu,
@@ -131,7 +112,6 @@ const {
   logout
 } = useMain()
 
-// --- Home data ---
 const mainImageSrc = mainImage
 
 const prices = reactive([
@@ -165,7 +145,6 @@ const pets = reactive([
   { name: 'Rodent', img: rodent, desc: 'Rodent description', modalOpen: false }
 ])
 
-// --- Modals & toast ---
 const openModal = (index) => { pets[index].modalOpen = true }
 const closeModal = (index) => { pets[index].modalOpen = false }
 

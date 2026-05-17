@@ -1,10 +1,8 @@
 <template>
   <div class="wrapper">
-    <!-- MAIN PROFILE SECTION -->
     <main class="profile-section">
       <div class="profile-container">
 
-        <!-- LEFT: Calendar & Reservation -->
         <div class="profile-left">
           <h2>Welcome back, {{ user?.jmeno }}!</h2>
           <div id="calendar">
@@ -20,49 +18,154 @@
               <div 
                 v-for="day in calendarDays" 
                 :key="day.date" 
-                :class="day.classes"
-                @click="selectDay(day)"
+                :class="[day.classes, { 'admin-disabled': isAdmin }]"
+                @click="!isAdmin && selectDay(day)"
               >
                 {{ day.number }}
               </div>
             </div>
           </div>
-          <button class="button modal-button" style="margin-top:20px;" @click="openRoomModal">Make Reservation</button>
+          <button v-if="!isAdmin" class="button modal-button" style="margin-top:20px;" @click="openRoomModal">Make Reservation</button>
         </div>
 
-        <!-- RIGHT: Pets -->
         <div class="profile-right">
-          <h2>My pets</h2>
-          <div id="pets-list">
-            <div class="pet-card pet-add-card" @click="openPetModal()">+</div>
-            <div v-for="pet in pets" :key="pet.idZvirata" class="pet-card">
-              <div class="pet-image">
-                <img :src="pet.imageUrl || '/Photos/default_pet.png'" alt="Pet" class="pet-img" @click.stop="selectImage(pet)">
-                <input type="file" ref="fileInputs" style="display:none" @change="uploadImage($event, pet)">
+
+          <!-- USER -->
+          <div v-if="!isAdmin">
+            <h2>My pets</h2>
+
+            <div id="pets-list">
+              <div class="pet-card pet-add-card" @click="openPetModal()">+</div>
+
+              <div v-for="pet in pets" :key="pet.idZvirata" class="pet-card">
+                <div class="pet-image">
+                  <img
+                    :src="pet.imageUrl || '/Photos/default_pet.png'"
+                    alt="Pet"
+                    class="pet-img"
+                    @click.stop="selectImage(pet)"
+                  >
+
+                  <input
+                    type="file"
+                    ref="fileInputs"
+                    style="display:none"
+                    @change="uploadImage($event, pet)"
+                  >
+                </div>
+
+                <div class="pet-info" @click="editPet(pet)">
+                  <span
+                    class="pet-delete"
+                    title="Delete Pet"
+                    @click.stop="confirmDeletePet(pet)"
+                  >
+                    &times;
+                  </span>
+
+                  <p><strong>Name:</strong> {{ pet.jmeno }}</p>
+                  <p><strong>Type:</strong> {{ pet.druh }}</p>
+                  <p><strong>Breed:</strong> {{ pet.plemeno }}</p>
+                  <p><strong>Age:</strong> {{ pet.vek }}</p>
+                  <p><strong>Health:</strong> {{ pet.zdravotniStav }}</p>
+                  <p><strong>Note:</strong> {{ shortNote(pet.poznamka) }}</p>
+                </div>
               </div>
-              <div class="pet-info" @click="editPet(pet)">
-                <span class="pet-delete" title="Delete Pet" @click.stop="confirmDeletePet(pet)">&times;</span>
-                <p><strong>Name:</strong> {{ pet.jmeno }}</p>
-                <p><strong>Type:</strong> {{ pet.druh }}</p>
-                <p><strong>Breed:</strong> {{ pet.plemeno }}</p>
-                <p><strong>Age:</strong> {{ pet.vek }}</p>
-                <p><strong>Health:</strong> {{ pet.zdravotniStav }}</p>
-                <p><strong>Note:</strong> {{ shortNote(pet.poznamka) }}</p>
+            </div>
+          </div>
+
+          <!-- ADMIN -->
+          <div v-else>
+            <h2>Reservations Info</h2>
+
+            <div class="admin-reservations-list">
+              <div
+                v-for="res in allReservations"
+                :key="res.id"
+                class="admin-reservation"
+                @click="openReservationDetail(res)"
+              >
+                <p><strong>Customer:</strong> {{ getCustomerName(res) }}</p>
+                <p><strong>Pet:</strong> {{ res.petName }}</p>
+                <p><strong>Date:</strong> {{ formatDate(res.datumOd) }} - {{ formatDate(res.datumDo) }}</p>
+                <p><strong>Price:</strong> ${{ res.celkovaCena }}</p>
+
+                <button @click.stop="openCancelReservation(res)">
+                  Cancel reservation
+                </button>
               </div>
             </div>
           </div>
         </div>
-
       </div>
 
-      <!-- Notifications -->
-      <div id="notifications" class="notifications">
-        <h2>Notifications | Reservations</h2>
-        <div v-for="note in notifications" :key="note.id">{{ note.text }}</div>
-      </div>
+      <div v-if="!isAdmin" id="notifications" class="notifications">
+          <h2>Notifications | Reservations</h2>
+
+          <div
+            v-for="note in notifications"
+            :key="note.id"
+          >
+            {{ note.text }}
+          </div>
+        </div>
+
+        <div v-if="isAdmin" class="notifications">
+
+          <h2>Hotel Overview</h2>
+
+          <div class="admin-stats">
+
+            <div class="admin-card">
+              <h3>Total Reservations</h3>
+              <p>{{ allReservations.length }}</p>
+            </div>
+
+            <div class="admin-card">
+              <h3>Active Reservations</h3>
+              <p>
+                {{
+                  allReservations.filter(r => {
+                    const now = new Date()
+
+                    return new Date(r.datumOd) <= now &&
+                          new Date(r.datumDo) >= now
+                  }).length
+                }}
+              </p>
+            </div>
+
+            <div class="admin-card">
+              <h3>Total Revenue</h3>
+              <p>
+                ${{
+                  allReservations.reduce((sum, r) =>
+                    sum + r.celkovaCena, 0
+                  )
+                }}
+              </p>
+            </div>
+          </div>
+
+          <div class="admin-card" style="margin-top:2rem;">
+
+            <h3>Upcoming Reservations</h3>
+
+            <div
+              v-for="res in allReservations
+                .filter(r => new Date(r.datumOd) > new Date())
+                .slice(0,5)"
+              :key="res.id"
+              style="margin-top:1rem;"
+            >
+              <strong>Customer:</strong> {{ res.customerName }}
+              |
+              <strong>Date:</strong> {{ formatDate(res.datumOd) }}
+            </div>
+          </div>
+        </div>
     </main>
 
-    <!-- PET MODAL -->
     <div v-if="showPetModal" class="modal" @click.self="closePetModal">
       <div class="modal-content">
         <span class="close" @click="closePetModal">&times;</span>
@@ -102,7 +205,6 @@
       </div>
     </div>
 
-    <!-- DELETE PET MODAL -->
     <div v-if="showDeleteModal" class="modal" @click.self="showDeleteModal=false">
       <div class="modal-content" style="width:400px;text-align:center;">
         <span class="close" @click="showDeleteModal=false">&times;</span>
@@ -114,7 +216,6 @@
       </div>
     </div>
 
-    <!-- ROOM MODAL -->
     <div v-if="showRoomModal" class="modal" @click.self="showRoomModal=false">
       <div class="modal-content" style="width:600px;">
         <span class="close" @click="showRoomModal=false">&times;</span>
@@ -142,344 +243,163 @@
       </div>
     </div>
 
-    <!-- TOAST NOTIFICATION -->
-    <div v-if="toast.show" :class="['toast', toast.type]">{{ toast.message }}</div>
+    <div
+      v-if="toast.visible"
+      :class="['toast', toast.type, { show: toast.visible }]"
+    >
+      {{ toast.message }}
+    </div>
+  </div>
 
+  <div v-if="showCancelReservationModal" class="modal" @click.self="showCancelReservationModal=false">
+    <div class="modal-content" style="width:40rem;text-align:center;">
+
+      <span class="close" @click="showCancelReservationModal=false">&times;</span>
+
+      <h3>Cancel reservation</h3>
+
+      <p style="color:#666; margin:1rem 0;">
+        Write reason for cancellation:
+      </p>
+
+      <textarea
+        v-model="cancelReason"
+        placeholder="Reason..."
+        style="width:100%; min-height:100px; padding:10px; border-radius:10px;"
+      ></textarea>
+
+      <div style="display:flex; gap:1rem; justify-content:center; margin-top:1.5rem;">
+        <button class="modal-button" style="background:#6b1d1d" @click="confirmCancelReservation">
+          Yes, cancel
+        </button>
+
+        <button class="modal-button" style="background:#888" @click="showCancelReservationModal=false">
+          No
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <div v-if="showReservationDetail" class="modal" @click.self="showReservationDetail = false">
+    <div class="reservation-detail-modal">
+
+      <span
+        class="close"
+        @click="showReservationDetail = false"
+      >
+        &times;
+      </span>
+
+      <div class="reservation-header">
+        <h2>Reservation Details</h2>
+
+        <div class="reservation-badge">
+          #{{ selectedReservation.id }}
+        </div>
+      </div>
+
+      <div v-if="selectedReservation" class="reservation-body">
+        <div class="detail-section">
+          <h3>Customer</h3>
+
+          <div class="detail-grid">
+            <div class="detail-card">
+              <span class="label">Customer</span>
+              <span class="value">
+                {{ selectedReservation.customerName }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>Pet</h3>
+
+          <div class="detail-grid">
+
+            <div class="detail-card">
+              <span class="label">Name</span>
+              <span class="value">
+                {{ selectedReservation.petName }}
+              </span>
+            </div>
+
+            <div class="detail-card">
+              <span class="label">Type</span>
+              <span class="value">
+                {{ selectedReservation.petType }}
+              </span>
+            </div>
+
+            <div class="detail-card">
+              <span class="label">Breed</span>
+              <span class="value">
+                {{ selectedReservation.petBreed }}
+              </span>
+            </div>
+
+            <div class="detail-card">
+              <span class="label">Age</span>
+              <span class="value">
+                {{ selectedReservation.petAge }} y.o.
+              </span>
+            </div>
+
+            <div class="detail-card full">
+              <span class="label">Health</span>
+              <span class="value">
+                {{ selectedReservation.petHealth || 'No health info' }}
+              </span>
+            </div>
+
+            <div class="detail-card full">
+              <span class="label">Note</span>
+              <span class="value">
+                {{ selectedReservation.petNote || 'No note' }}
+              </span>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h3>Reservation Information</h3>
+
+          <div class="detail-grid">
+
+            <div class="detail-card">
+              <span class="label">From</span>
+              <span class="value">
+                {{ formatDate(selectedReservation.datumOd) }}
+              </span>
+            </div>
+
+            <div class="detail-card">
+              <span class="label">To</span>
+              <span class="value">
+                {{ formatDate(selectedReservation.datumDo) }}
+              </span>
+            </div>
+
+            <div class="detail-card full total-price">
+              <span class="label">Total Price</span>
+              <span class="price">
+                ${{ selectedReservation.celkovaCena }}
+              </span>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import { ref, reactive, onMounted, computed } from "vue";
-import axios from "axios";
-
-export default {
-  name: "ProfilePage",
-  setup() {
-        const user = ref(JSON.parse(localStorage.getItem("user") || sessionStorage.getItem("user")));
-        const pets = ref([]);
-        const notifications = ref([]);
-        const reservations = ref([]);
-
-        const filteredPetsForRoom = (room) => {
-      if (!room) return [];
-      return pets.value.filter(pet => {
-        if (!pet || !pet.druh) return false;
-        const type = pet.druh.toLowerCase();
-        if ((room.id === 1 || room.id === 2) && type === 'cat') return true;
-        if ((room.id === 3 || room.id === 4) && type === 'dog') return true;
-        return false;
-      });
-    };
-    // PET MODAL
-    const showPetModal = ref(false);
-    const editingPet = ref(null);
-    const petForm = reactive({
-      jmeno: '',
-      druh: '',
-      plemeno: '',
-      vek: null,
-      zdravotniStav: '',
-      poznamka: ''
-    });
-
-    // DELETE PET
-    const showDeleteModal = ref(false);
-    let petToDelete = null;
-
-    // ROOM MODAL
-    const showRoomModal = ref(false);
-    const rooms = ref([
-      {id:1,name:"Standard Room For Cats",price:50,image:"/Photos/catRoom1.jpg",description:"Cozy standard room designed specifically for cats. Includes daily fresh food, clean water, and a private litter box.", selectedPetId:null},
-      {id:2,name:"Larger Room For Cats",price:60,image:"/Photos/catRoom2.gif",description:"Spacious suite suitable for multiple cats from the same household. Equipped with climbing structures, shelves, toys, and multiple resting spots. Fresh food and water are provided daily, and litter boxes are cleaned frequently.", selectedPetId:null},
-      {id:3,name:"Standard Cage For Dogs",price:70,image:"/Photos/dogRoom1.webp",description:"Comfortable kennel designed for small to medium-sized dogs. The price includes daily feeding, fresh water, and regular outdoor walks.", selectedPetId:null},
-      {id:4,name:"Larger Cage For Dogs",price:90,image:"/Photos/dogRoom2.jpg",description:"Larger, luxury room for dogs who need extra space and attention. In addition to fresh food, water, and daily walks, this package also includes basic training and interactive play sessions with our staff.", selectedPetId:null}
-    ]);
-
-    // CALENDAR
-    const today = new Date();
-    const currentMonth = ref(today.getMonth());
-    const currentYear = ref(today.getFullYear());
-    const selectedDates = ref([]);
-    const calendarDays = ref([]);
-    const weekdays = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-    const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-    const monthName = computed(()=> monthNames[currentMonth.value]);
-
-    const toast = reactive({ show:false, message:'', type:'success' });
-
-    // ------------ METHODS ------------
-
-    const fetchPets = async () => {
-  try {
-    const res = await axios.get(`http://localhost:8080/api/zvirata/by-user?zakaznikId=${user.value.idZakaznici}`);
-    pets.value = res.data.map(p => ({
-      ...p,
-      // pokud je imageUrl, přidej serverovou doménu, jinak default obrázek
-      imageUrl: p.imageUrl ? `http://localhost:8080${p.imageUrl}` : '/Photos/default_pet.png'
-    }));
-  } catch(e){ console.error(e); }
-};
-
-    const fetchReservations = async () => {
-  try {
-    const res = await axios.get(`http://localhost:8080/api/rezervace/by-user?zakaznikId=${user.value.idZakaznici}`);
-    reservations.value = res.data.map(r => {
-      const start = new Date(r.datumOd);
-      const end = new Date(r.datumDo);
-      let dates = [];
-      let current = new Date(start);
-      while(current <= end){
-        const d = new Date(current);
-        d.setHours(0,0,0,0); // důležité pro přesné porovnání
-        dates.push(d);
-        current.setDate(current.getDate()+1);
-      }
-      return {...r, dates};
-    });
-
-    // Aktualizujeme kalendář, aby se zobrazily zarezervované dny
-    generateCalendar();
-
-  } catch(e){ console.error(e); }
-};
-
-    const formatDate = (dateStr) => {
-  const date = new Date(dateStr);
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = date.getFullYear();
-  return `${day}.${month}.${year}`;
-};
-
-const fetchNotifications = async () => {
-  await fetchReservations();
-  notifications.value = reservations.value.map(r => {
-    const pet = pets.value.find(p => p.idZvirata === r.petId);
-    return { 
-      id: r.id, 
-      text: `${formatDate(r.datumOd)} - ${formatDate(r.datumDo)} | Pet: ${pet?.jmeno || 'Unknown'} | Total price: $${r.celkovaCena}` 
-    };
-  });
-};
-
-    const shortNote = (note) => {
-      if(!note) return '';
-      const words = note.split(' ');
-      return words.slice(0,3).join(' ') + (words.length>3 ? ' ...' : '');
-    };
-
-    const openPetModal = () => { showPetModal.value = true; editingPet.value = null; Object.assign(petForm, { jmeno:'', druh:'', plemeno:'', vek:null, zdravotniStav:'', poznamka:'' }); };
-    const closePetModal = () => showPetModal.value=false;
-
-    const editPet = (pet) => {
-      editingPet.value = pet;
-      Object.assign(petForm, pet);
-      showPetModal.value = true;
-    };
-
-    const savePet = async () => {
-  try {
-    if(editingPet.value){
-      const res = await axios.put(`http://localhost:8080/api/zvirata/update/${editingPet.value.idZvirata}`, petForm);
-      pets.value = pets.value.map(p => p.idZvirata === res.data.idZvirata ? {
-        ...res.data,
-        imageUrl: res.data.imageUrl ? `http://localhost:8080${res.data.imageUrl}` : '/Photos/default_pet.png'
-      } : p);
-    } else {
-      const res = await axios.post(`http://localhost:8080/api/zvirata/add?zakaznikId=${user.value.idZakaznici}`, petForm);
-      pets.value.push({
-        ...res.data,
-        imageUrl: res.data.imageUrl ? `http://localhost:8080${res.data.imageUrl}` : '/Photos/default_pet.png'
-      });
-    }
-    closePetModal();
-  } catch(e){ console.error(e); }
-};
-    const confirmDeletePet = (pet) => { petToDelete = pet; showDeleteModal.value = true; };
-    const deletePet = async () => {
-      try{
-        await axios.delete(`http://localhost:8080/api/zvirata/delete/${petToDelete.idZvirata}`);
-        pets.value = pets.value.filter(p=>p.idZvirata!==petToDelete.idZvirata);
-        showDeleteModal.value=false;
-      }catch(e){ console.error(e);}
-    };
-
-    const selectImage = (pet) => { const input = document.createElement('input'); input.type='file'; input.accept='image/*'; input.onchange=e=>uploadImage({target:e.target}, pet); input.click(); };
-    const uploadImage = async (e, pet) => {
-  const file = e.target.files[0];
-  if(!file) return;
-  const formData = new FormData();
-  formData.append("file", file);
-  try {
-    const res = await axios.post(`http://localhost:8080/api/zvirata/upload-image/${pet.idZvirata}`, formData);
-    const idx = pets.value.findIndex(p=>p.idZvirata===pet.idZvirata);
-    pets.value[idx] = {
-      ...res.data,
-      imageUrl: res.data.imageUrl ? `http://localhost:8080${res.data.imageUrl}` : '/Photos/default_pet.png'
-    };
-  } catch(err){ console.error(err); }
-};
-    // CALENDAR
-    const selectedStart = ref(null);
-const selectedEnd = ref(null);
-    const generateCalendar = () => {
-  const firstDay = new Date(currentYear.value, currentMonth.value, 1).getDay();
-  const lastDate = new Date(currentYear.value, currentMonth.value + 1, 0).getDate();
-  const days = [];
-
-  const todayDate = new Date();
-  todayDate.setHours(0,0,0,0);
-
-  // prázdné dny na začátku měsíce
-  for(let i=0; i<(firstDay+6)%7; i++) days.push({date:null, number:null, classes:'calendar-day empty'});
-
-  for(let d=1; d<=lastDate; d++){
-    const dateStr = `${currentYear.value}-${String(currentMonth.value+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const dayDate = new Date(dateStr);
-    dayDate.setHours(0,0,0,0);
-    let classes = 'calendar-day';
-
-    if(d === today.getDate() && currentMonth.value === today.getMonth() && currentYear.value === today.getFullYear()) {
-      classes += ' today';
-    }
-
-    if(dayDate < todayDate){
-      classes += ' past';
-    }
-
-    // vybrané dny
-    if (selectedStart.value) {
-      const startDate = new Date(selectedStart.value);
-      const endDate = selectedEnd.value ? new Date(selectedEnd.value) : startDate;
-      startDate.setHours(0,0,0,0);
-      endDate.setHours(0,0,0,0);
-      if(dayDate >= startDate && dayDate <= endDate){
-        classes += ' selected';
-      }
-    }
-
-    // již rezervované dny
-    reservations.value.forEach(res => {
-      res.dates.forEach(resDate => {
-        const resDay = new Date(resDate);
-        resDay.setHours(0,0,0,0);
-        if(dayDate.getTime() === resDay.getTime()) {
-          classes += ' reserved';
-        }
-      });
-    });
-
-    days.push({date: dateStr, number: d, classes});
-  }
-
-  calendarDays.value = days;
-};
-
-    const prevMonth = ()=>{ currentMonth.value--; if(currentMonth.value<0){currentMonth.value=11; currentYear.value--; } generateCalendar(); };
-    const nextMonth = ()=>{ currentMonth.value++; if(currentMonth.value>11){currentMonth.value=0; currentYear.value++; } generateCalendar(); };
-
-    const selectDay = (day) => {
-  if (!day.date) return;
-
-  const clickedDate = new Date(day.date);
-  const todayDate = new Date();
-  todayDate.setHours(0,0,0,0); // ignorujeme čas
-
-  if (clickedDate < todayDate) return;
-
-  if (!selectedStart.value || (selectedStart.value && selectedEnd.value)) {
-    selectedStart.value = day.date;
-    selectedEnd.value = null;
-  } else if (!selectedEnd.value) {
-    const startDate = new Date(selectedStart.value);
-    if (clickedDate < startDate) {
-      selectedEnd.value = selectedStart.value;
-      selectedStart.value = day.date;
-    } else {
-      selectedEnd.value = day.date;
-    }
-  }
-
-  // Aktualizujeme selectedDates podle start a end
-  selectedDates.value = [];
-  if (selectedStart.value) {
-    const start = new Date(selectedStart.value);
-    const end = selectedEnd.value ? new Date(selectedEnd.value) : start;
-    let current = new Date(start);
-    while (current <= end) {
-      const dStr = `${current.getFullYear()}-${String(current.getMonth()+1).padStart(2,'0')}-${String(current.getDate()).padStart(2,'0')}`;
-      selectedDates.value.push(dStr);
-      current.setDate(current.getDate()+1);
-    }
-  }
-
-  generateCalendar();
-};
-
-    const matchPetRoom = (pet, room) => {
-  if(!pet || !pet.druh) return false;  // <-- ochrana proti undefined
-  const type = pet.druh.toLowerCase();
-  if((room.id===1||room.id===2) && type==='cat') return true;
-  if((room.id===3||room.id===4) && type==='dog') return true;
-  return false;
-};
-
-    const openRoomModal = () => showRoomModal.value=true;
-    const reserveRoom = async (room) => {
-  if(!room.selectedPetId) return alert("Select pet");
-  if(selectedDates.value.length < 2) return alert("Select at least 2 days");
-
-  // seřadíme pole podle data
-  const sortedDates = selectedDates.value.sort((a,b)=> new Date(a) - new Date(b));
-
-  const datumOd = sortedDates[0];
-  const datumDo = sortedDates[sortedDates.length - 1];
-  const days = sortedDates.length;
-
-  const celkovaCena = room.price * days;
-
-  try {
-    await axios.post("http://localhost:8080/api/rezervace/add", {
-      zakaznikId: user.value.idZakaznici,
-      petId: room.selectedPetId,
-      roomId: room.id,
-      datumOd,
-      datumDo,
-      celkovaCena,
-      poznamka: ""
-    });
-
-    toast.message = `Room ${room.name} reserved!`;
-    toast.type = 'success';
-    toast.show = true;
-    setTimeout(() => toast.show = false, 2000);
-
-    showRoomModal.value = false;
-    await fetchReservations();
-    await fetchNotifications();
-  } catch(err) {
-    console.error(err);
-  }
-};
-
-    const logout = ()=>{
-      localStorage.removeItem('user'); sessionStorage.removeItem('user'); window.location.href="/login";
-    };
-
-    onMounted(async ()=>{
-      await fetchPets();
-      await fetchReservations();
-      await fetchNotifications();
-      generateCalendar();
-    });
-
-    return { 
-  user, pets, notifications, showPetModal, editingPet, petForm, showDeleteModal, showRoomModal, rooms, shortNote,
-  openPetModal, closePetModal, editPet, savePet, confirmDeletePet, deletePet,
-  selectImage, uploadImage, weekdays, monthName, currentYear, calendarDays, prevMonth, nextMonth, selectDay,
-  matchPetRoom, openRoomModal, reserveRoom, toast, logout,filteredPetsForRoom};
-  }
-}
+import profilePage from "../composables/profilePage.js";
+export default profilePage;
 </script>
 
 <style scoped>

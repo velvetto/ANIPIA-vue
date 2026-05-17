@@ -12,7 +12,6 @@ import Footer from './components/Footer.vue'
 
 const route = useRoute()
 
-// neukazuj Header/Footr na login a signup
 const showHeaderFooter = computed(() => {
   return !['/login', '/signup'].includes(route.path)
 })

@@ -35,31 +35,35 @@ Pro testování odesílání e-mailů v aplikaci bylo zvoleno použit Mailtrap, 
 Taky poskytuje přehledné uživatelské rozhraní, ve kterém lze kontrolovat obsah i formát zpráv. Navíc se snadno integruje se Spring Bootem (což je ideální pro tenhle projekt) a dalšími vývojářskými nástroji pomocí jednoduchého SMTP nastavení.
 
 ## Struktura projektu
-ANIPIA/
+hotel-anipia-vue/
 ├── data/
 │   ├── anipia.mv.db
 │   └── anipia.trace.db
-├── Documentation/
-│   ├── Diagrams/
-│   ├── UI/
-│   ├── Business story.pdf
-│   └── Product page.png
 ├── Spring/anipia/
 │   └── src/
 │       ├── main/java/com/anipia/
+│       │   ├── config/
 │       │   ├── controller/
+│       │   ├── dto/
 │       │   ├── model/
 │       │   ├── repository/
 │       │   ├── service/
 │       │   └── AnipiaApplication.java
 │       └── resources/
-│           ├── static/
-│           │   ├── CSS/
-│           │   ├── Photos/
-│           │   └── *.html, *.js
-│           ├── templates/
 │           └── application.properties
-└── README.md
+├── vue/
+│   ├── src/
+│   │   ├── assets/
+│   │   │   ├── CSS/
+│   │   │   └── Photos/
+│   │   ├── components/
+│   │   ├── composables/
+│   │   ├── router/
+│   │   ├── views/
+│   │   ├── App.vue
+│   │   └── main.js
+│   └── index.html
+└── package.json
 
 ## Odeslání formuláře
 
@@ -118,7 +122,7 @@ Pro spuštění a nastavení projektu jsou násldedující kroky:
 
 ### 4. Odpověď backendu (Controller na Frontend)
 - Pokud je registrace úspěšná, tak se zobrazí zpráva, že všechno proběhlo úspěšně.
-- Pokud e-mail už existuje nebo nastane jiná chyba, vrátí se chybá zpráva.
+- Pokud e-mail už existuje nebo nastane jiná chyba, vrátí se chybná zpráva.
 
 ### 5. Zobrazení výsledku uživateli (Frontend)
 - Frontend přijme odpověď z backendu.
@@ -154,6 +158,26 @@ Slouží k vytvoření nového uživatele (zákazníka) v databázi.
 
 Slouží k ověření uživatelských údajů při přihlašování. Jestli uživatel existuje, tak ho přihlásí do profilu.
 
+**Další endpointy:**
+
+**8. POST /api/rezervace/add**
+
+**9. GET /api/rezervace/by-user**
+
+**10. GET /api/rezervace/all**
+
+**11. DELETE /api/rezervace/{id}**
+
+**12. PUT /api/zvirata/update/{id}**
+
+**13. POST /api/zvirata/upload-image/{id}**
+
+**14. POST /api/zvirata/add**
+
+**15. GET /api/zvirata/by-user**
+
+**16. GET /api/zvirata/delete/{id}**
+
 ## Testování API (přes curl - cmd)
 ### Příkaz pro příjmutí dat formuláře a jejích zpracování:
 curl -X POST http://localhost:8080/contact/submit ^ -H "Content-Type: application/json" ^
@@ -182,3 +206,20 @@ curl -X POST http://localhost:8080/api/zakaznici/signup ^
 curl -X POST http://localhost:8080/api/zakaznici/login ^
 -H "Content-Type: application/json" ^
 -d "{\"email\":\"uzivatel@test\",\"heslo\":\"qwerty12\"}"
+
+## Složitější databázový dotaz
+### Kteří zákazníci mají nejvíce rezervací
+SELECT z.JMENO, z.PRIJMENI, COUNT(r.ID) AS POCET_REZERVACI
+FROM REZERVACE r
+JOIN ZAKAZNICI z ON r.ZAKAZNIK_ID = z.ID_ZAKAZNICI
+GROUP BY z.JMENO, z.PRIJMENI
+ORDER BY POCET_REZERVACI DESC;
+
+### Kteří zákazníci jsou bez rezervace
+SELECT z.JMENO,z.PRIJMENI,z.EMAIL
+FROM ZAKAZNICI z
+LEFT JOIN REZERVACE r ON z.ID_ZAKAZNICI = r.ZAKAZNIK_ID
+WHERE r.ID IS NULL;
+
+### Zobrazení dokumentace API pomocí Swagger
+http://localhost:8080/swagger-ui/index.html

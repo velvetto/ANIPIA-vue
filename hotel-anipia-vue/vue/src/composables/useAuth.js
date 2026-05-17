@@ -3,10 +3,6 @@ import { useRouter } from 'vue-router'
 
 export function useAuth() {
   const router = useRouter()
-
-  /* =====================
-     FORM
-  ===================== */
   const form = reactive({
     firstName: '',
     lastName: '',
@@ -16,21 +12,14 @@ export function useAuth() {
     confirmPassword: '',
     rememberMe: false
   })
-
-  /* =====================
-     STATE
-  ===================== */
   const error = ref('')
-
   const toast = reactive({
     visible: false,
     message: '',
     type: 'success'
   })
 
-  /* =====================
-     TOAST
-  ===================== */
+  /*TOAST*/
   const showToast = (message, type = 'success') => {
     toast.message = message
     toast.type = type
@@ -40,9 +29,7 @@ export function useAuth() {
     }, 4000)
   }
 
-  /* =====================
-     LOGIN
-  ===================== */
+  /*LOGIN*/
   const login = async () => {
     error.value = ''
 
@@ -84,13 +71,10 @@ export function useAuth() {
     }
   }
 
-  /* =====================
-     SIGNUP
-  ===================== */
+  /*SIGNUP*/
   const signup = async () => {
   error.value = ''
 
-  // Lokální validace
   const errors = []
   if (form.password.length < 8) errors.push('Password must be at least 8 characters.')
   if (form.password !== form.confirmPassword) errors.push('Passwords do not match.')
@@ -126,7 +110,6 @@ export function useAuth() {
     showToast('Server error', 'error')
   }
 }
-
   return {
     form,
     error,

@@ -59,14 +59,14 @@
 
         <div class="form-group">
           <label for="email">Email</label>
-          <input id="email" v-model="form.email" type="email" />
+          <input id="email" v-model="form.email" type="email" placeholder="@"/>
         </div>
       </div>
 
       <div class="form-row">
         <div class="form-group full-width">
           <label for="message">Message</label>
-          <textarea id="message" v-model="form.message"></textarea>
+          <textarea id="message" v-model="form.message" placeholder="..."></textarea>
         </div>
       </div>
 
@@ -91,6 +91,8 @@
 <script>
 import '../assets/CSS/aboutStyles.css'
 import { ref } from 'vue'
+import { onMounted } from 'vue'
+
 
 import hotel from '../assets/Photos/About/hotel.png'
 import care from '../assets/Photos/About/care.png'
@@ -110,6 +112,16 @@ import vet from '../assets/Photos/About/veterinarian.webp'
 export default {
 
   setup() {
+      onMounted(() => {
+        const storedUser =
+          JSON.parse(localStorage.getItem('user')) ||
+          JSON.parse(sessionStorage.getItem('user'))
+
+        if (storedUser) {
+          form.value.name = `${storedUser.jmeno} ${storedUser.prijmeni}`
+          form.value.email = storedUser.email
+        }
+      })
     const icons = [
       {
         img: hotel,

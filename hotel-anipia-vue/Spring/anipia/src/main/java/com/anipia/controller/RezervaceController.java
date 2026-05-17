@@ -1,7 +1,11 @@
 package com.anipia.controller;
 
+import com.anipia.dto.Reservation;
 import com.anipia.model.Rezervace;
+import com.anipia.repository.RezervaceRepository;
 import com.anipia.service.RezervaceService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -22,12 +26,20 @@ public class RezervaceController {
     }
 
     @GetMapping("/by-user")
-    public List<Rezervace> getByUser(@RequestParam Long zakaznikId) {
+    public List<Reservation> getByUser(@RequestParam Long zakaznikId) {
         return service.getByUser(zakaznikId);
     }
 
     @DeleteMapping("/{id}")
     public void deleteRezervace(@PathVariable Long id) {
         service.deleteRezervace(id);
+    }
+
+    @Autowired
+    private RezervaceRepository rezervaceRepository;
+
+    @GetMapping("/all")
+    public List<Reservation> getAllReservations() {
+        return service.getAll();
     }
 }

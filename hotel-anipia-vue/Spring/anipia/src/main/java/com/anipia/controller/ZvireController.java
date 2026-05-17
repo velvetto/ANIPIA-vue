@@ -97,6 +97,8 @@ public class ZvireController {
 }
 
 // DELETE mazlíčka podle ID
+// V PS:
+// curl.exe -X DELETE http://localhost:8080/api/zvirata/delete/1
 @DeleteMapping("/delete/{id}")
 public ResponseEntity<?> deleteZvire(@PathVariable Long id) {
     Optional<Zvire> optZvire = zvireRepository.findById(id);

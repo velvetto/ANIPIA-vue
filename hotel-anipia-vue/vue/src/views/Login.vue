@@ -87,7 +87,6 @@ async function handleLogin() {
     if (response.ok) {
       const data = await response.json();
       data.email = email.value;
-
       // Uložení podle rememberMe
       if (rememberMe.value) {
         localStorage.setItem('user', JSON.stringify(data));

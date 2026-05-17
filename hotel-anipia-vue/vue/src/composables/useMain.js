@@ -1,7 +1,6 @@
 import { ref, onMounted } from 'vue'
 
 export function useMain() {
-  // Hamburger menu
   const isMenuActive = ref(false)
   function toggleMenu() {
     isMenuActive.value = !isMenuActive.value
@@ -52,7 +51,6 @@ export function useMain() {
     setTimeout(() => { toast.value = '' }, 4000)
   }
 
-  // Odhlášení a předvyplnění
   const user = ref(null)
 
   onMounted(() => {
@@ -70,19 +68,7 @@ export function useMain() {
     setTimeout(() => { window.location.href = "/" }, 1500)
   }
 
-  return {
-    isMenuActive,
-    toggleMenu,
-    closeMenu,
-    activePetModal,
-    openPetModal,
-    closePetModal,
-    name,
-    email,
-    message,
-    toast,
-    submitForm,
-    user,
-    logout
+  return {isMenuActive, toggleMenu, closeMenu, activePetModal, openPetModal, closePetModal, name, email,
+    message, toast, submitForm, user, logout
   }
 }

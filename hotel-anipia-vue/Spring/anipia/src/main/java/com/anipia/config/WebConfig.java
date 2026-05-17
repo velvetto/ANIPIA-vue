@@ -10,21 +10,19 @@ import java.nio.file.Paths;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    // ✅ CORS pro Vue
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins(
-                        "http://localhost:5173",   // Vite (nejčastější)
-                        "http://127.0.0.1:5500",   // Live Server
-                        "http://localhost:8080"   // případně stejný server
+                        "http://localhost:5173",
+                        "http://127.0.0.1:5500",
+                        "http://localhost:8080"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);
     }
 
-    // ✅ Servírování uploadovaných souborů
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         String uploadPath = Paths.get("uploads").toFile().getAbsolutePath();

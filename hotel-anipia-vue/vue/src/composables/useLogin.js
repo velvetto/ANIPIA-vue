@@ -1,4 +1,3 @@
-// src/composables/useLogin.js
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -44,14 +43,15 @@ export function useLogin() {
       })
     })
 
-    // ❗ backend vrací 500 → tady to ošetříme
     if (!response.ok) {
       showToast('Invalid email or password', 'error')
       return
     }
 
+    import { ADMIN_EMAIL } from '@/config/admin'
     const data = await response.json()
     data.email = form.email
+    data.isAdmin = data.email === ADMIN_EMAIL
 
     if (form.rememberMe) {
       localStorage.setItem('user', JSON.stringify(data))

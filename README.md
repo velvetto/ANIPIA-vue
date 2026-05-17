@@ -1,5 +1,5 @@
-ANIPIA
-Hotel pro domácí mazlíčky
+## ANIPIA
+**Hotel pro domácí mazlíčky**
 
 # Požadavky
 * Java 17
@@ -9,6 +9,7 @@ Hotel pro domácí mazlíčky
 - Stáhnout si soubor hotel-anipia-vue, ve kterém jsou veškeré zdrojové kódy.
 - Otevřit soubor v nějakém editoru, např. VS Code.
 - Podle struktury projektu se přemístit do AnipiaApplication.java a následně ho spustit.
+- Přejít do Vue složky: ➡ cd vue.
 - V terminalu spustit vue pomocí příkazu npm run dev.
 - Aplikace poběží na: ➡ http://localhost:5173
 
