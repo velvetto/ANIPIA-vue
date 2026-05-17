@@ -1,11 +1,11 @@
 # Software Design Description
 ## Pro Hotel Anipia
 
-**Verze:** 1.0
+**Verze:** 1.1
 
 **Autor:** Yelyzaveta Yefremova
 
-**Datum:** 22.05.2025
+**Datum:** 17.05.2026
 
 Obsah
 =================
@@ -67,12 +67,12 @@ Hotel Anipia je samostatná webová aplikace, která je postavena na architektu�
 
 - **Přihlášení:** Uživatel zadá e-mail a heslo potom backend je ověří jestli jsou v systému. Při úspěchu se vrátí uživatelská data a frontend uloží stav přihlášení.
 
-- **Profil:** V budoucnu se zobrazí údaje přihlášeného uživatele a umožní momentálně je možnost odhlášení.
+- **Profil:** Zobrazení údajů přihlášeného uživatele a jeho odhlášení.
 
 ### 2.3 Uživatelské charakteristiky
 - **Uživatel:** má docela jednoduché rozhraní, nápovědy a validace vstupů.
 
-- **Administrátor (budoucí rozšíření):** má celý přístup k databázi zpráv a uživatelů.
+- **Administrátor:** má celý přístup k databázi rezervací a uživatelů.
 
 ### 2.4 Omezení
 Zatím aplikace je určena pouze pro lokální nebo vývojové prostředí (jako je H2 databáze). SMTP server je simulován pomocí Mailtrap, což není produkční a určeno pouze pro testování funkčnosti aplikace.
@@ -129,14 +129,13 @@ Celkově je tři typů testů:
 ---
 
 ## 8. Deployment
-Projekt je sestavován pomocí nástroje Maven, který zajišťuje správu závislostí a build aplikace. Backend se spouští jako Spring Boot aplikace, kterou lze spustit příkazem java -jar. Frontend je statický a může být spuštěn přímo ve vývojovém prostředí nebo pomocí libovolného HTTP serveru. Pro vývojové účely je databáze H2 použita jako in-memory databáze, což umožňuje rychlé a snadné spuštění bez nutnosti instalace složitější databáze. Je to ideální varianta pro začátek.
+Projekt je sestavován pomocí nástroje Maven, který zajišťuje správu závislostí a build aplikace. Backend se spouští jako Spring Boot aplikace, kterou lze spustit příkazem java -jar. Frontend je statický a může být spuštěn přímo ve vývojovém prostředí nebo pomocí libovolného HTTP serveru. Pro vývojové účely je databáze H2 použita jako in-memory databáze, což umožňuje rychlé a snadné spuštění bez nutnosti instalace složitější databáze. 
 
 ---
 
 ## 9. Budoucí rozšíření
 Jedním z hlavních kroků bude nahrazení dočasně používané databáze H2 lepší databázi MySQL. To umožní dlouhodobé ukládání dat, větší škálovatelnost systému a možnost práce s větší velikosti informací.
-Dalším vylepšením bude zavedení pokročilejší autentizační vrstvy pomocí JWT, která umožní bezpečnější a flexibilnější správu uživatelských relací, zejména v případě, že aplikace bude rozšířena o samostatné administrátorské rozhraní. Správa administrátorů a možnost jejich přístupu k přehledu zpráv, registrací nebo statistik bude dalším logickým krokem v rozvoji aplikace.
-Rozšíření funkcí by mohlo zahrnovat také rezervace služeb přes kalendář, platby online, automatické odpovědi na e-maily, notifikace pro uživatele a další možností.
+Rozšíření funkcí by mohlo zahrnovat také platby online, automatické odpovědi na e-maily, notifikace pro uživatele a další možností.
 
 ---
 
