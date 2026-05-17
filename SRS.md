@@ -1,11 +1,11 @@
 # Software Requirements Specification
 ## Pro Hotel Anipia
 
-**Verze:** 1.0
+**Verze:** 1.1
 
 **Autor:** Yelyzaveta Yefremova
 
-**Datum:** 22.05.2025
+**Datum:** 17.05.2026
 
 Obsah
 =================
