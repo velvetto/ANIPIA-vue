@@ -1,5 +1,5 @@
-## ANIPIA
-**Hotel pro domácí mazlíčky**
+ANIPIA
+Hotel pro domácí mazlíčky
 
 # Požadavky
 * Java 17
