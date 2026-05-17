@@ -20,3 +20,6 @@ Otevřit v prohlížeči: ➡ http://localhost:8080/h2-console
 - JDBC URL: jdbc:h2:file:./data/anipia
 - User: sa
 - Password: (ponechat prázdným)
+
+# Zobrazení dokumentace API pomocí Swagger
+http://localhost:8080/swagger-ui/index.html
