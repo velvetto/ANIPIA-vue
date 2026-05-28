@@ -1,4 +1,4 @@
-# Software Design Description
+# Software Design Document
 ## Pro Hotel Anipia
 
 **Verze:** 1.1
@@ -40,7 +40,7 @@ Obsah
 Tento dokument popisuje návrh a architekturu webové aplikace Hotel Anipia, která umožňuje uživatelům (zákazníkům) vytvořit rezervaci pokojů pro své domácí mazlíčky. Dokument slouží jako technický podklad pro vývojáře a správce systému, a definuje klíčové komponenty, rozhraní, datové struktury a celkové funkce aplikace.
 
 ### 1.2 Rozsah systému 
-Hotel Anipia je webová aplikace, která má několik hlávních funkcí, jako je odesílání kontaktního formuláře (uložení do databáze, odeslání e-mailu), registrace uživatelů a jejich autentizace (přihlášení a odhlášení). Systém také zahrnuje frontend (HTML, CSS, JS) a backend (Java Spring Boot), používá relační databázi H2 a simuluje e-mailový server pomocí Mailtrap.
+Hotel Anipia je webová aplikace, která má několik hlávních funkcí, jako je odesílání kontaktního formuláře (uložení do databáze, odeslání e-mailu), registrace uživatelů a jejich autentizace (přihlášení a odhlášení). Systém také zahrnuje frontend (HTML, CSS, JS, vue) a backend (Java Spring Boot), používá relační databázi H2 a simuluje e-mailový server pomocí Mailtrap.
 
 ### 1.3 Definice a zkratky
 - **API** – Application Programming Interface
@@ -52,13 +52,14 @@ Hotel Anipia je webová aplikace, která má několik hlávních funkcí, jako j
 - **JS**: JavaScript je programovací jazyk, který se používá hlavně pro tvorbu interaktivních a dynamických webových stránek a aplikací
 - **CSS**: Jazyk, který se používá k definování vzhledu a rozložení webových stránek
 - **HTML**: Je to hypertextový značkovací jazyk, který slouží k definování struktury a obsahu webových stránek
+- **Vue.js**: Je frontend JavaScript framework pro tvorbu webových uživatelských rozhraní
 
 ---
 
 ## 2. Obecný popis
 
 ### 2.1 Perspektiva produktu 
-Hotel Anipia je samostatná webová aplikace, která je postavena na architektuře klient-server. Frontend je tvořen statickými webovými stránkami, které pomocí AJAXu komunikují s backendem poskytujícím REST API. Hlavní funkčnost aplikace zahrnuje odesílání kontaktního formuláře, kde uživatel vyplní své jméno, e-mail a zprávu, která je následně uložena do databáze a odeslána e-mailem. Dále aplikace podporuje registraci nových uživatelů, kde probíhá ověření jedinečnosti e-mailu a bezpečné uložení hesla pomocí hashování. Přihlášení umožňuje uživateli přístup do jeho profilu, kde se může také odhlásit.
+Hotel Anipia je samostatná webová aplikace, která je postavena na architektuře klient-server. Frontend je tvořen statickými webovými stránkami, které pomocí AJAXu komunikují s backendem poskytujícím REST API. Hlavní funkčnost aplikace zahrnuje odesílání kontaktního formuláře, kde uživatel vyplní své jméno, e-mail a zprávu, která je následně uložena do databáze a odeslána e-mailem. Dále aplikace podporuje registraci nových uživatelů, kde probíhá ověření jedinečnosti e-mailu a bezpečné uložení hesla pomocí hashování. Přihlášení umožňuje uživateli přístup do jeho profilu, kde se může také odhlásit. Také po úspěšném přihlášení uživatel může přidat do svého profilu mazličky, kterým následně může vytvořit rezervaci pomocí kalendáře.
 
 ### 2.2 Funkce systému
 - **Kontaktní formulář:** Uživatel vyplní jméno, e-mail a samotnou zprávu, pak se data pošlou AJAX voláním na backend. Zpráva se uloží a odešle se e-mailem, po čem uživatel dostane potvrzení.
@@ -67,12 +68,16 @@ Hotel Anipia je samostatná webová aplikace, která je postavena na architektu�
 
 - **Přihlášení:** Uživatel zadá e-mail a heslo potom backend je ověří jestli jsou v systému. Při úspěchu se vrátí uživatelská data a frontend uloží stav přihlášení.
 
-- **Profil:** Zobrazení údajů přihlášeného uživatele a jeho odhlášení.
+- **Profil:** Zobrazení údajů přihlášeného uživatele a jeho odhlášení. 
+
+- **Přidání mazlíčků:** Uživatel má možnost vytvoření profilu pro své domácí mazlícky dle struktury formuláře.
+
+- **Rezervace:** Pomocí kalendáře uživatel může jednodušše vytvořit rezervaci pokoje pro svého mazlíčka.
 
 ### 2.3 Uživatelské charakteristiky
 - **Uživatel:** má docela jednoduché rozhraní, nápovědy a validace vstupů.
 
-- **Administrátor:** má celý přístup k databázi rezervací a uživatelů.
+- **Administrátor:** má celý přístup k databázi rezervací a uživatelů. Může stornovat rezervace a má o nich přehled.
 
 ### 2.4 Omezení
 Zatím aplikace je určena pouze pro lokální nebo vývojové prostředí (jako je H2 databáze). SMTP server je simulován pomocí Mailtrap, což není produkční a určeno pouze pro testování funkčnosti aplikace.
@@ -96,7 +101,7 @@ Backendová část je rozdělena do několika vrstev. Controller přijímá HTTP
 Služby obsahují obchodní logiku, jako je ukládání dat do databáze a odesílání e-mailů, zatímco repository vrstva komunikuje přímo s databází. Pro ukládání uživatelů a jejich hesel je nasázena bezpečnostní logika, která zahrnuje hashování hesel pomocí BCrypt.
 
 ### 4.3 Databáze
-Celkově databáze obsahuje spoustu tabulek, ale zatím je použito jenom dvě. Jedna z nich je tabulka Zakaznik, která obsahuje sloupce pro identifikaci uživatele, jeho jméno, příjmení, telefon, e-mail a hash hesla. Druhá tabulka ContactForm ukládá odeslané zprávy s informacemi o odesílateli a časovém razítku.
+Celkově databáze obsahuje spoustu tabulek. Jedna z hlavních je tabulka Zakaznik, která obsahuje sloupce pro identifikaci uživatele, jeho jméno, příjmení, telefon, e-mail a hash hesla. Druhá tabulka ContactForm ukládá odeslané zprávy s informacemi o odesílateli a časovém razítku.
 
 ---
 
