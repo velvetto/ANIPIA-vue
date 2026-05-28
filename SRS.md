@@ -52,7 +52,8 @@ Systém bude tvořen webovou aplikací, která umožní uživatelům registraci 
 - **JS**: JavaScript je programovací jazyk, který se používá hlavně pro tvorbu interaktivních a dynamických webových stránek a aplikací.
 - **CSS**: Jazyk, který se používá k definování vzhledu a rozložení webových stránek.
 - **HTML**: Je to hypertextový značkovací jazyk, který slouží k definování struktury a obsahu webových stránek.
-- **API** – Application Programming Interface
+- **API**: Application Programming Interface
+- **Vue.js**: Je frontend JavaScript framework pro tvorbu webových uživatelských rozhraní
 
 ---
 
@@ -62,13 +63,13 @@ Systém bude tvořen webovou aplikací, která umožní uživatelům registraci 
 Webová aplikace je samostatným informačním systémem s architekturou klient-server. Klientská část běží ve webovém prohlížeči a je tvořena statickým HTML, CSS a JS. Serverová část je vyvinuta v jazyce Java za použití frameworku Spring Boot. Systém využívá databázi H2 pro ukládání uživatelských dat a kontaktních zpráv. Součástí je i integrace se službou Mailtrap, která simuluje odesílání e-mailů.  
 
 ### 2.2 Funkce systému  
-Aplikace umožní návštěvníkovi se nejprve zaregistrovat pomocí jednoduchého formuláře. Registrovaný uživatel se poté může přihlásit a získat přístup ke svému profilu. Dále je možné odeslat kontaktní formulář, který je zpracován serverem, uložen do databáze a odeslán na určitou e-mailovou adresu firmy. Administrativní funkce umožňují export těchto zpráv do PDF dokumentu pro pozdější zpracování a celkový přehled.  
+Aplikace umožní návštěvníkovi se nejprve zaregistrovat pomocí jednoduchého formuláře. Registrovaný uživatel se poté může přihlásit a získat přístup ke svému profilu. Také po úspěšném přihlášení uživatel může přidat do svého profilu mazličky, kterým následně může vytvořit rezervaci pomocí kalendáře. Dále je možné odeslat kontaktní formulář, který je zpracován serverem, uložen do databáze a odeslán na určitou e-mailovou adresu firmy. Administrativní funkce umožňují export těchto zpráv do PDF dokumentu pro pozdější zpracování a celkový přehled.  
 
 ### 2.3 Uživatelské rozhraní  
 Uživatelské rozhraní je minimalistické a přehledné, což usnadňuje hledání věcí na webu. Skládá se z mnoha stránek, jako je úvodní, ze stránky s obrázky, kontakty a jiné. Formulář na stránce "About" je validovány pomocí JS a zpětná vazba bude poskytována bez nutnosti reloadu stránky. Kontaktní formulář obsahuje vstupní pole pro jméno, e-mail a samotní zprávu.  
 
 ### 2.4 Omezení  
-Aplikace je určena pouze pro demonstrační účely. Vzhledem k použití služby Mailtrap nejsou e-maily odesílány reálným adresátům. Hesla zatím nelze resetovat a neexistuje správa uživatelských práv ani rozdělení rolí. V budoucnu tyhle možností budou přidáná. Systém zatím není připraven pro nasazení do produkčního prostředí a není optimalizován pro vysoké zatížení, což bude také vyřešeno v pozdějších fázích.  
+Aplikace je určena pouze pro demonstrační účely. Vzhledem k použití služby Mailtrap nejsou e-maily odesílány reálným adresátům. Hesla zatím nelze resetovat a neexistuje správa uživatelských práv. V budoucnu tyhle možností budou přidáná. Systém zatím není připraven pro nasazení do produkčního prostředí a není optimalizován pro vysoké zatížení, což bude také vyřešeno v pozdějších fázích.  
 
 ### 2.5 Předpoklady a závislosti  
 K běhu aplikace je použito prostředí s Java 17, Maven a Spring Boot frameworkem. Dále byl vytvořen účet pro přístup k Mailtrap SMTP. Ceůková vývoj byl testován pomoci příkazového řádku CMD ve Windows a běh systému byl ověřen na adrese `localhost:8080`.
